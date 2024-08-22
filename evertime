@@ -1,26 +1,23 @@
 #!/bin/sh
 
 sem=0
-tmp_path='/tmp/evertime'
+tmp='/tmp/evertime'
 
 start() {
-	if test -z "$1"
-	then
-		usage
-	fi
+	test -n "$1" || usage
 	( ./evertime '__sh' "$1" & )
 }
 
 _stop() {
-	if test -f $tmp_path
+	if test -f $tmp
 	then
-		kill "$(head -1 $tmp_path)"
-		rm -f $tmp_path
+		kill "$(cat $tmp)"
+		rm $tmp
 	fi
 }
 
 usage() {
-	echo 'usage: evertime <command> [<arg>]'
+	echo 'Usage: evertime <command> [<arg>]' 1>&2
 	exit 1
 }
 
@@ -28,7 +25,7 @@ __sh() {
 	fn=db/$1
 	rp='([0-9]*) ([0-9]*) <'
 
-	echo $$ > $tmp_path
+	echo $$ > $tmp
 	echo "$(date +%s) $(date +%s) <" >> "$fn"
 
 	while [ $sem = 0 ]
