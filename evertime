@@ -1,5 +1,6 @@
 #!/bin/sh
 
+sem=0
 tmp_path='/tmp/evertime'
 
 start() {
@@ -24,11 +25,19 @@ usage() {
 }
 
 __sh() {
+	fn=db/$1
+	rp='([0-9]*) ([0-9]*) <'
+
 	echo $$ > $tmp_path
-	while true
+	echo "$(date +%s) $(date +%s) <" >> "$fn"
+
+	while [ $sem = 0 ]
 	do
-		sleep 10
+		sleep 1m
+		sed -i -E "s/$rp/\1 $(date +%s) </g" "$fn"
 	done
+
+	sed -i -E "s/$rp/\1 \2/g" "$fn"
 }
 
 main() {
@@ -42,6 +51,7 @@ main() {
 
 if test '__sh' = "$1"
 then
+	trap 'sem=1' TERM
 	__sh "$2"
 else
 	main "$@"
