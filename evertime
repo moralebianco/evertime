@@ -1,5 +1,7 @@
 #!/bin/sh
 
+tmp_path='/tmp/evertime'
+
 start() {
 	if test -z "$1"
 	then
@@ -9,8 +11,8 @@ start() {
 }
 
 _stop() {
-	kill "$(head -1 /tmp/evertime)"
-	rm -f '/tmp/evertime'
+	kill "$(head -1 $tmp_path)"
+	rm -f $tmp_path
 }
 
 usage() {
@@ -19,7 +21,7 @@ usage() {
 }
 
 __sh() {
-	echo $$ > '/tmp/evertime'
+	echo $$ > $tmp_path
 	while true
 	do
 		sleep 10
