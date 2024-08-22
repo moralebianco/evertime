@@ -5,15 +5,25 @@ start() {
 	then
 		usage
 	fi
+	( ./evertime '__sh' "$1" & )
 }
 
 _stop() {
-	echo 0
+	kill "$(head -1 /tmp/evertime)"
+	rm -f '/tmp/evertime'
 }
 
 usage() {
 	echo 'usage: evertime <command> [<arg>]'
 	exit 1
+}
+
+__sh() {
+	echo $$ > '/tmp/evertime'
+	while true
+	do
+		sleep 10
+	done
 }
 
 main() {
@@ -25,4 +35,9 @@ main() {
 	esac
 }
 
-main "$@"
+if test '__sh' = "$1"
+then
+	__sh "$2"
+else
+	main "$@"
+fi
