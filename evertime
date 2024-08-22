@@ -11,8 +11,11 @@ start() {
 }
 
 _stop() {
-	kill "$(head -1 $tmp_path)"
-	rm -f $tmp_path
+	if test -f $tmp_path
+	then
+		kill "$(head -1 $tmp_path)"
+		rm -f $tmp_path
+	fi
 }
 
 usage() {
