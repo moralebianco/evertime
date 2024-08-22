@@ -2,6 +2,7 @@
 
 sem=0
 tmp='/tmp/evertime'
+dbp=$HOME'/.evertime'
 
 start() {
 	test -n "$1" || usage
@@ -22,7 +23,7 @@ usage() {
 }
 
 __sh() {
-	fn=db/$1
+	fn=$dbp/$1
 	rp='([0-9]*) ([0-9]*) <'
 
 	echo $$ > $tmp
@@ -38,7 +39,7 @@ __sh() {
 }
 
 main() {
-	mkdir -p 'db/'
+	mkdir -p "$dbp"
 	case $1 in
 		start)  start "$2";;
 		stop)   _stop;;
