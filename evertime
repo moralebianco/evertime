@@ -34,7 +34,7 @@ usage() {
 	exit 1
 }
 
-__sh() {
+proc() {
 	fn=$dbp/$1
 	rp='([0-9]*) ([0-9]*) <'
 
@@ -63,7 +63,7 @@ main() {
 if test '__sh' = "$1"
 then
 	trap 'sem=1' TERM
-	__sh "$2"
+	proc "$2"
 else
 	main "$@"
 fi
