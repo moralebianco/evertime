@@ -5,12 +5,14 @@ tmp='/tmp/evertime'
 dbp=$HOME'/.evertime'
 
 start() {
+	test -f $tmp && exit 1
 	test -n "$1" || usage
 	( ./evertime '__sh' "$1" & )
 }
 
 stats() {
 	test -n "$1" || usage
+	test -f "$dbp/$1" || exit 2
 
 	while read -r _in out _
 	do
@@ -24,8 +26,10 @@ stats() {
 _stop() {
 	if test -f $tmp
 	then
-		kill "$(cat $tmp)"
+		kill "$(cat $tmp)" || exit 3
 		rm $tmp
+	else
+		exit 1
 	fi
 }
 
