@@ -5,14 +5,14 @@ tmp='/tmp/evertime'
 dbp=$HOME'/.evertime'
 
 start() {
-	test -f $tmp && exit 1
-	test -n "$1" || usage
+	[ -f $tmp ] && exit 1
+	[ -n "$1" ] || usage
 	( ./evertime '__sh' "$1" & )
 }
 
 stats() {
-	test -n "$1" || usage
-	test -f "$dbp/$1" || exit 2
+	[ -n "$1" ] || usage
+	[ -f "$dbp/$1" ] || exit 2
 
 	while read -r _in out _
 	do
@@ -24,7 +24,7 @@ stats() {
 }
 
 _stop() {
-	if test -f $tmp
+	if [ -f $tmp ]
 	then
 		kill "$(cat $tmp)" || exit 3
 		rm $tmp
@@ -64,7 +64,7 @@ main() {
 	esac
 }
 
-if test '__sh' = "$1"
+if [ '__sh' = "$1" ]
 then
 	trap 'sem=1' TERM
 	proc "$2"
