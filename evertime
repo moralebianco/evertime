@@ -9,6 +9,18 @@ start() {
 	( ./evertime '__sh' "$1" & )
 }
 
+stats() {
+	test -n "$1" || usage
+
+	while read -r _in out _
+	do
+		acc=$((acc + out - _in))
+		echo "$(date -d @$((out - _in)) -u '+%H-%M')  $(date -d "@$_in" '+%Y-%m-%d %H:%M')"
+	done < "$dbp/$1"
+
+	date -d "@$acc" -u '+%H:%M'
+}
+
 _stop() {
 	if test -f $tmp
 	then
@@ -42,6 +54,7 @@ main() {
 	mkdir -p "$dbp"
 	case $1 in
 		start)  start "$2";;
+		stats)  stats "$2";;
 		stop)   _stop;;
 		*)      usage;;
 	esac
