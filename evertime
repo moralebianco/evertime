@@ -10,17 +10,29 @@ start() {
 	( ./evertime '__sh' "$1" & )
 }
 
-stats() {
-	[ -n "$1" ] || usage
-	[ -f "$dbp/$1" ] || exit 2
+_stat() {
+	basename "$1"
 
 	while read -r _in out _
 	do
-		acc=$((acc + out - _in))
-		echo "$(date -d @$((out - _in)) -u '+%H-%M')  $(date -d "@$_in" '+%Y-%m-%d %H:%M')"
-	done < "$dbp/$1"
+		dif=$((out - _in))
+		acc=$((acc + dif))
+		echo "$(date -d "@$dif" -u '+%H-%M')  $(date -d "@$_in" '+%Y-%m-%d %H:%M')"
+	done < "$1"
 
 	date -d "@$acc" -u '+%H:%M'
+}
+
+stats() {
+	if [ -n "$1" ]
+	then
+		([ -f "$dbp/$1" ] || exit 2) && _stat "$dbp/$1"
+	else
+		for f in "$dbp/"*
+		do
+			_stat "$f"
+		done
+	fi
 }
 
 _stop() {
