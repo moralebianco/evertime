@@ -46,7 +46,7 @@ _stop() {
 }
 
 usage() {
-	echo 'Usage: evertime <command> [<arg>]' 1>&2
+	echo 'Usage: evertime [start <task> | stats [task] | stop]' 1>&2
 	exit 1
 }
 
@@ -70,7 +70,8 @@ main() {
 	mkdir -p "$dbp"
 	case $1 in
 		start)  start "$2";;
-		stats)  stats "$2";;
+		stats|'')
+			stats "$2";;
 		stop)   _stop;;
 		*)      usage;;
 	esac
