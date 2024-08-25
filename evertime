@@ -6,20 +6,18 @@ dbp=$HOME'/.evertime'
 
 start() {
 	[ -f $tmp ] && exit 1
-	[ -n "$1" ] || usage
+	[ -z "$1" ] && usage
 	( ./evertime '__sh' "$1" & )
 }
 
 _stat() {
 	basename "$1"
 
-	while read -r _in out _
+	while read -r f l _
 	do
-		dif=$((out - _in))
-		acc=$((acc + dif))
-		echo "$(date -d "@$dif" -u '+%H-%M')  $(date -d "@$_in" '+%Y-%m-%d %H:%M')"
+		acc=$((acc + l - f))
+		echo "$(date -d "@$((l - f))" -u '+%H-%M')  $(date -d "@$f" '+%Y-%m-%d %H:%M')"
 	done < "$1"
-
 	date -d "@$acc" -u '+%H:%M'
 }
 
@@ -34,13 +32,8 @@ stats() {
 }
 
 _stop() {
-	if [ -f $tmp ]
-	then
-		kill "$(cat $tmp)" || exit 3
-		rm $tmp
-	else
-		exit 1
-	fi
+	[ -f $tmp ] || exit 1
+	kill "$(cat $tmp)" && rm $tmp || exit 3
 }
 
 usage() {
@@ -55,12 +48,10 @@ proc() {
 	echo $$ > $tmp
 	echo "$(date +%s) $(date +%s) <" >> "$fn"
 
-	while [ $sem = 0 ]
+	while [ $sem -eq 0 ]
 	do
-		sleep 1m
-		sed -i -E "s/$rp/\1 $(date +%s) </g" "$fn"
+		sleep 60 && sed -i -E "s/$rp/\1 $(date +%s) </g" "$fn"
 	done
-
 	sed -i -E "s/$rp/\1 \2/g" "$fn"
 }
 
