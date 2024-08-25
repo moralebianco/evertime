@@ -24,15 +24,13 @@ _stat() {
 }
 
 stats() {
-	if [ -n "$1" ]
-	then
-		([ -f "$dbp/$1" ] || exit 2) && _stat "$dbp/$1"
-	else
-		for f in "$dbp/"*
-		do
-			_stat "$f"
-		done
-	fi
+	[ $# -ge 1 ] && shift 1
+	[ $# -ge 1 ] && v=$* || v=$(ls "$dbp")
+
+	for f in $v
+	do
+		([ -f "$dbp/$f" ] || exit 2) && _stat "$dbp/$f"
+	done
 }
 
 _stop() {
@@ -46,7 +44,7 @@ _stop() {
 }
 
 usage() {
-	echo 'Usage: evertime [start <task> | stats [task] | stop]' 1>&2
+	echo 'Usage: evertime [start <task> | stats [task ...] | stop]' 1>&2
 	exit 1
 }
 
@@ -71,7 +69,7 @@ main() {
 	case $1 in
 		start)  start "$2";;
 		stats|'')
-			stats "$2";;
+			stats "$@";;
 		stop)   _stop;;
 		*)      usage;;
 	esac
