@@ -3,6 +3,7 @@
 sem=0
 tmp='/tmp/evertime'
 dbp=$HOME'/.evertime'
+log=$dbp'/.logs'
 
 start() {
 	[ -f $tmp ] && exit 1
@@ -45,7 +46,8 @@ proc() {
 	fn=$dbp/$1
 	rp='([0-9]*) ([0-9]*) <'
 
-	echo $$ > $tmp
+	sed -i -E "s/$rp/\1 \2/g" "$(tail -1 "$log")"
+	echo $$ > $tmp && echo "$1" >> "$log"
 	echo "$(date +%s) $(date +%s) <" >> "$fn"
 
 	while [ $sem -eq 0 ]
