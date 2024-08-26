@@ -4,4 +4,4 @@ POSIX-compliant script for tracking task times.
 
 Installation
 ------------
-In Linux you can copy the script to /usr/local/bin after making it executable.
+In Linux you can copy the executable to /usr/local/bin.
