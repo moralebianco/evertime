@@ -11,12 +11,13 @@ start() {
 }
 
 _stat() {
+	acc=0
 	basename "$1"
 
 	while read -r f l _
 	do
 		acc=$((acc + l - f))
-		echo "$(date -d "@$((l - f))" -u '+%H-%M')  $(date -d "@$f" '+%Y-%m-%d %H:%M')"
+		echo "$(date -d "@$((l - f))" -u '+%H:%M')  $(date -d "@$f" '+%Y-%m-%d %H:%M')"
 	done < "$1"
 	date -d "@$acc" -u '+%H:%M'
 }
