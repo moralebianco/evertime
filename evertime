@@ -8,7 +8,7 @@ log=$dbp'/.logs'
 start() {
 	[ -f $tmp ] && exit 1
 	[ -z "$1" ] && usage
-	( ./evertime '__sh' "$1" & )
+	( evertime '__sh' "$1" & )
 }
 
 _stat() {
@@ -46,7 +46,7 @@ proc() {
 	fn=$dbp/$1
 	rp='([0-9]*) ([0-9]*) <'
 
-	sed -i -E "s/$rp/\1 \2/g" "$(tail -1 "$log")"
+	[ -f "$log" ] && sed -i -E "s/$rp/\1 \2/g" "$(tail -1 "$log")"
 	echo $$ > $tmp && echo "$1" >> "$log"
 	echo "$(date +%s) $(date +%s) <" >> "$fn"
 
