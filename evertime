@@ -17,9 +17,10 @@ _stat() {
 	while read -r time min _
 	do
 		acc=$((acc + min))
-		echo "$(date -d @$((min * 60)) -u '+%H:%M%t')$time"
+		echo "$(date -d @$((min * 60)) -u '+  %H:%M%t')$time"
 	done < "$1"
-	date -d @$((acc * 60)) -u '+%H:%M'
+	printf '%d' $((acc / 1440))
+	date -d @$((acc * 60)) -u '+:%H:%M'
 }
 
 stats() {
