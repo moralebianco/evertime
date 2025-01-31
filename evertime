@@ -14,12 +14,12 @@ _stat() {
 	acc=0
 	basename "$1"
 
-	while read -r f l _
+	while read -r time min _
 	do
-		acc=$((acc + l - f))
-		echo "$(date -d "@$((l - f))" -u '+%H:%M')  $(date -d "@$f" '+%Y-%m-%d %H:%M')"
+		acc=$((acc + min))
+		echo "$(date -d @$((min * 60)) -u '+%H:%M%t')$time"
 	done < "$1"
-	date -d "@$acc" -u '+%H:%M'
+	date -d @$((acc * 60)) -u '+%H:%M'
 }
 
 stats() {
@@ -44,16 +44,18 @@ usage() {
 
 proc() {
 	fn=$dbp/$1
-	rp='([0-9]*) ([0-9]*) <'
+	rp='^(.+) ([0-9]+) <$'
 
 	[ -f "$dbp/.tf" ] && sed -i -E "s/$rp/\1 \2/g" "$(cat "$dbp/.tf")"
 
 	echo $$ > $tmp && echo "$fn" > "$dbp/.tf"
-	echo "$(date +%s) $(date +%s) <" >> "$fn"
+	echo "$(date -u '+%D-%R') 0 <" >> "$fn"
+	min=0
 
 	while [ $sem -eq 0 ]
 	do
-		sleep 60 && sed -i -E "s/$rp/\1 $(date +%s) </g" "$fn"
+		min=$((min + 1))
+		sleep 60 && sed -i -E "s/$rp/\1 $min </g" "$fn"
 	done
 	sed -i -E "s/$rp/\1 \2/g" "$fn"
 }
