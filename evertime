@@ -5,19 +5,21 @@ tmp='/tmp/evertime'
 dbp=$HOME'/.evertime'
 
 start() {
+	shift 1
 	[ -f $tmp ] && exit 1
 	[ -z "$1" ] && usage
-	( evertime '__sh' "$1" & )
+	( evertime '__sh' "$@" & )
 }
 
 _stat() {
 	acc=0
 	basename "$1"
 
-	while read -r time min _
+	while read -r time min note
 	do
 		acc=$((acc + min))
-		echo "$(date -d @$((min * 60)) -u '+  %H:%M%t')$time"
+		min=$(date -d @$((min * 60)) -u '+  %H:%M ')
+		printf '%s%+15s %s\n' "$min" "$time" "$note"
 	done < "$1"
 	printf '%d' $((acc / 1440))
 	date -d @$((acc * 60)) -u '+:%H:%M'
@@ -39,32 +41,32 @@ _stop() {
 }
 
 usage() {
-	echo 'Usage: evertime [start <task> | stats [task ...] | stop]' 1>&2
+	echo 'Usage: evertime [start <task> [note] | stats [task ...] | stop]' 1>&2
 	exit 1
 }
 
 proc() {
-	fn=$dbp/$1
-	rp='^(.+) ([0-9]+) <$'
+	fn=$dbp/$2
 
-	[ -f "$dbp/.tf" ] && sed -i -E "s/$rp/\1 \2/g" "$(cat "$dbp/.tf")"
+	[ -f "$dbp/.tf" ] && sed -i -E "s/^>(.+)/\1/g" "$(cat "$dbp/.tf")"
 
 	echo $$ > $tmp && echo "$fn" > "$dbp/.tf"
-	echo "$(date -u '+%D-%R') 0 <" >> "$fn"
+	echo ">$(date -u '+%D-%R') 0 $3" >> "$fn"
 	min=0
 
 	while [ $sem -eq 0 ]
 	do
 		min=$((min + 1))
-		sleep 60 && sed -i -E "s/$rp/\1 $min </g" "$fn"
+		sleep 60
+		sed -i -E "s/^>([^ ]+) ([0-9]+) (.*)$/>\1 $min \3/g" "$fn"
 	done
-	sed -i -E "s/$rp/\1 \2/g" "$fn"
+	sed -i -E "s/^>(.+)/\1/g" "$fn"
 }
 
 main() {
 	mkdir -p "$dbp"
 	case $1 in
-		start)  start "$2";;
+		start)  start "$@";;
 		stats|'')
 			stats "$@";;
 		stop)   _stop;;
@@ -75,7 +77,7 @@ main() {
 if [ '__sh' = "$1" ]
 then
 	trap 'sem=1' TERM
-	proc "$2"
+	proc "$@"
 else
 	main "$@"
 fi
